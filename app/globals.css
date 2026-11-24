@@ -81,7 +81,8 @@ button { font: inherit; }
 .hero-copy { position: relative; z-index: 1; padding-top: 6px; }
 .eyebrow { font-size: 9px; letter-spacing: .14em; color: #aaa5ad; display: flex; align-items: center; gap: 10px; }
 .eyebrow-rule { width: 25px; height: 1px; background: var(--orange); }
-.hero h1 { font-size: clamp(72px, 8.7vw, 128px); font-weight: 500; letter-spacing: -.085em; line-height: .88; margin: 31px 0 38px; }
+.hero h1 { font-size: clamp(72px, 8.7vw, 128px); font-weight: 500; letter-spacing: -.085em; line-height: .88; margin: 31px 0 24px; }
+.hero-status { color: var(--orange); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 32px; }
 .hero-italic, .section-heading h2 span, .about-layout h2 span, .contact-layout h2 span { color: var(--orange); font-family: Georgia, 'Times New Roman', serif; font-weight: 400; font-style: italic; letter-spacing: -.075em; }
 .hero-bottom { max-width: 438px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; }
 .hero-intro { font-size: 15px; line-height: 1.75; color: #aaa6ad; margin: 0; max-width: 350px; }

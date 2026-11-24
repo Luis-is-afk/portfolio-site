@@ -91,6 +91,7 @@ export default function PortfolioPage() {
       <div className="hero-copy">
         <div className="eyebrow"><span className="eyebrow-rule" /> DATA-DRIVEN. PEOPLE-FOCUSED. CURIOUS BY DEFAULT.</div>
         <h1>I find the<br />story in the <span className="hero-italic">signals.</span></h1>
+        <p className="hero-status">Now on GitHub</p>
         <div className="hero-bottom">
           <p className="hero-intro">I&apos;m <strong>Luis Arreola</strong> — a computer science grad turning complex data into clear decisions, and ideas into things that work.</p>
           <a className="round-link" href="#work" aria-label="Explore selected work"><ArrowDown size={20} /></a>
