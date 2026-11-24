@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { ArrowDown, ArrowDownRight, ArrowUpRight, Mail, MapPin, Menu, X } from 'lucide-react'
+import { useState } from 'react'
+import Image from 'next/image'
+import { ArrowDown, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Mail, MapPin, Menu, X } from 'lucide-react'
 import type { CSSProperties } from 'react'
 
 type Project = {
@@ -11,7 +12,9 @@ type Project = {
   description: string
   tags: string[]
   href: string
-  visual: 'bikes' | 'health' | 'compiler'
+  image: string
+  imageAlt: string
+  world: string
   note: string
 }
 
@@ -19,66 +22,60 @@ const projects: Project[] = [
   {
     number: '01', category: 'Analytics', title: 'Cyclistic, decoded.',
     description: '6.1 million rides reveal two very different cities: one commuting, one exploring. A reproducible R workflow turns that contrast into a conversion strategy.',
-    tags: ['R', 'tidyverse', 'Data storytelling'], href: 'https://github.com/Luis-is-afk/cyclistic-bike-share-analysis', visual: 'bikes', note: '6.1M trips · 81% seasonal casual rides',
+    tags: ['R', 'tidyverse', 'Data storytelling'], href: 'https://github.com/Luis-is-afk/cyclistic-bike-share-analysis', image: '/images/planet-cycling.png', imageAlt: 'A miniature lakeside city planet with bike paths winding around its surface', world: 'The City of Two Rhythms', note: '6.1M trips · 81% seasonal casual rides',
   },
   {
     number: '02', category: 'Analytics', title: 'The signal behind the grades.',
     description: 'A weighted analysis of 13,000+ CDC survey responses, exploring how academic performance is associated with youth mental-health outcomes.',
-    tags: ['Python', 'statsmodels', 'Public health'], href: 'https://github.com/Luis-is-afk/YRBSS-Case-Study', visual: 'health', note: '13K+ respondents · 2023 YRBSS',
+    tags: ['Python', 'statsmodels', 'Public health'], href: 'https://github.com/Luis-is-afk/YRBSS-Case-Study', image: '/images/planet-research.png', imageAlt: 'A forested university planet traced with public-health data constellations', world: 'The Observatory of Signals', note: '13K+ respondents · 2023 YRBSS',
   },
   {
     number: '03', category: 'Engineering', title: 'A compiler, from the ground up.',
     description: 'A Pascal-subset compiler built with a hand-written scanner, recursive-descent parser, symbol table, and x86 assembly generation.',
-    tags: ['C++', 'Parsing', 'x86 Assembly'], href: 'https://github.com/NightlyPenguin/PascalliteCompiler', visual: 'compiler', note: 'Scanner → parser → assembly',
+    tags: ['C++', 'Parsing', 'x86 Assembly'], href: 'https://github.com/NightlyPenguin/PascalliteCompiler', image: '/images/planet-compiler.png', imageAlt: 'A mechanical planet of orbital circuits, code, and compiler machinery', world: 'The Machine World', note: 'Scanner → parser → assembly',
   },
 ]
 
-const filters = ['All work', 'Analytics', 'Engineering'] as const
+function ProjectExplorer() {
+  const [activeIndex, setActiveIndex] = useState(0)
+  const activeProject = projects[activeIndex]
+  const previousProject = projects[(activeIndex - 1 + projects.length) % projects.length]
+  const nextProject = projects[(activeIndex + 1) % projects.length]
 
-type ProjectFilter = (typeof filters)[number]
+  return <div className="planet-explorer">
+    <div className="planet-stage" role="group" aria-label={`Project planet ${activeIndex + 1} of ${projects.length}`}>
+      <div className="planet-starfield" aria-hidden="true" />
+      <span className="planet-coordinate planet-coordinate-top">SECTOR {activeProject.number} / {activeProject.category.toUpperCase()}</span>
+      <span className="planet-coordinate planet-coordinate-bottom">{activeProject.world}</span>
+      <div className="planet-orbit" aria-hidden="true" />
+      <div className="planet-globe" key={activeProject.number}>
+        <Image src={activeProject.image} alt={activeProject.imageAlt} width={1024} height={1024} sizes="(max-width: 650px) 68vw, 360px" priority={activeIndex === 0} className="planet-image" />
+        <span className="planet-atmosphere" aria-hidden="true" />
+      </div>
+      <button className="planet-arrow planet-arrow-previous" type="button" aria-label={`Previous project: ${previousProject.title}`} onClick={() => setActiveIndex((current) => (current - 1 + projects.length) % projects.length)}>
+        <ArrowLeft size={20} />
+      </button>
+      <button className="planet-arrow planet-arrow-next" type="button" aria-label={`Next project: ${nextProject.title}`} onClick={() => setActiveIndex((current) => (current + 1) % projects.length)}>
+        <ArrowRight size={20} />
+      </button>
+    </div>
 
-function ProjectVisual({ type }: { type: Project['visual'] }) {
-  if (type === 'bikes') {
-    return <div className="project-visual bike-visual" aria-label="Abstract visualization of bike-share ride patterns">
-      <div className="visual-caption"><span>RIDES / MONTH</span><span>2023—24</span></div>
-      <div className="bar-chart" aria-hidden="true">{[32, 44, 39, 56, 62, 51, 69, 78, 72, 91, 84, 100].map((height, index) => <i key={index} style={{ height: `${height}%`, '--i': index } as CSSProperties} />)}</div>
-      <div className="chart-legend"><span><i className="legend-dot orange" />MEMBERS</span><span><i className="legend-dot lilac" />CASUAL</span></div>
-      <div className="visual-watermark">6.1<span>M</span></div>
+    <article className="planet-description" aria-live="polite" aria-atomic="true">
+      <div className="planet-description-meta"><span>{activeProject.number} / {activeProject.category}</span><span>{String(activeIndex + 1).padStart(2, '0')} — {String(projects.length).padStart(2, '0')} WORLDS</span></div>
+      <h3>{activeProject.title}</h3>
+      <p>{activeProject.description}</p>
+      <div className="planet-tags">{activeProject.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
+      <div className="planet-description-footer"><span>{activeProject.note}</span><a href={activeProject.href} target="_blank" rel="noreferrer">EXPLORE PROJECT <ArrowUpRight size={15} /></a></div>
+    </article>
+
+    <div className="planet-pager" role="group" aria-label="Choose a project planet">
+      {projects.map((project, index) => <button key={project.number} type="button" className={index === activeIndex ? 'planet-pager-dot active' : 'planet-pager-dot'} aria-label={`View ${project.title}`} aria-pressed={index === activeIndex} onClick={() => setActiveIndex(index)} />)}
     </div>
-  }
-  if (type === 'health') {
-    return <div className="project-visual health-visual" aria-label="Abstract risk signal visualization">
-      <div className="visual-caption"><span>OUTCOME SIGNALS</span><span>YRBSS / 2023</span></div>
-      <div className="signal-grid" aria-hidden="true"><div className="signal-axis"><span>10×</span><span>5×</span><span>1×</span></div><div className="signal-lines"><i /><i /><i /><i /><b className="signal-point point-one" /><b className="signal-point point-two" /><b className="signal-point point-three" /></div></div>
-      <div className="signal-labels"><span>GRADE D</span><span>GRADE C</span><span>GRADE B</span><span>GRADE A</span></div>
-      <div className="visual-watermark">13<span>K</span></div>
-    </div>
-  }
-  return <div className="project-visual compiler-visual" aria-label="Code-inspired illustration of a compiler">
-    <div className="code-window"><div className="window-top"><span /><span /><span /><small>pascalite.pas</small></div><pre><span className="code-purple">program</span> hello_world;{'\n'}<span className="code-purple">var</span>{'    '}message: <span className="code-yellow">string</span>;{'\n'}<span className="code-purple">begin</span>{'\n'}{'    '}message := <span className="code-green">&quot;hello, world&quot;</span>;{'\n'}{'    '}writeln(message);{'\n'}<span className="code-purple">end</span>.<span className="cursor">▍</span></pre></div>
-    <div className="compiler-stamp">SOURCE<br /><span>→</span> MACHINE</div>
   </div>
 }
 
-function ProjectCard({ project }: { project: Project }) {
-  return <article className={`project-card project-${project.visual}`}>
-    <a className="project-card-link" href={project.href} target="_blank" rel="noreferrer" aria-label={`View ${project.title} on GitHub`}>
-      <ProjectVisual type={project.visual} />
-      <div className="project-copy">
-        <div className="project-meta"><span>{project.number} / {project.category}</span><span className="project-open"><ArrowUpRight size={17} /></span></div>
-        <h3>{project.title}</h3>
-        <p>{project.description}</p>
-        <div className="project-tags">{project.tags.map(tag => <span key={tag}>{tag}</span>)}</div>
-        <div className="project-note">{project.note}</div>
-      </div>
-    </a>
-  </article>
-}
-
 export default function PortfolioPage() {
-  const [filter, setFilter] = useState<ProjectFilter>('All work')
   const [menuOpen, setMenuOpen] = useState(false)
-  const visibleProjects = useMemo(() => filter === 'All work' ? projects : projects.filter(project => project.category === filter), [filter])
 
   return <main>
     <header className="site-header">
@@ -94,6 +91,7 @@ export default function PortfolioPage() {
       <div className="hero-copy">
         <div className="eyebrow"><span className="eyebrow-rule" /> DATA-DRIVEN. PEOPLE-FOCUSED. CURIOUS BY DEFAULT.</div>
         <h1>I find the<br />story in the <span className="hero-italic">signals.</span></h1>
+        <p className="hero-status">Now on GitHub</p>
         <div className="hero-bottom">
           <p className="hero-intro">I&apos;m <strong>Luis Arreola</strong> — a computer science grad turning complex data into clear decisions, and ideas into things that work.</p>
           <a className="round-link" href="#work" aria-label="Explore selected work"><ArrowDown size={20} /></a>
@@ -111,9 +109,8 @@ export default function PortfolioPage() {
     </section>
 
     <section className="work-section" id="work">
-      <div className="section-heading"><div><span className="section-kicker">A FEW THINGS I&apos;VE MADE</span><h2>Selected <span>work.</span></h2></div><p>Research, analysis, and engineering—built to make the complicated a little more clear.</p></div>
-      <div className="work-toolbar"><div className="filter-tabs" role="group" aria-label="Filter projects">{filters.map(item => <button key={item} type="button" className={filter === item ? 'filter-button active' : 'filter-button'} aria-pressed={filter === item} onClick={() => setFilter(item)}>{item}</button>)}</div><span className="project-count">0{visibleProjects.length} PROJECTS / 2024—26</span></div>
-      <div className="projects-grid">{visibleProjects.map(project => <ProjectCard key={project.number} project={project} />)}</div>
+      <div className="section-heading"><div><span className="section-kicker">FLYING THROUGH THE PROJECTS</span><h2>Project <span>worlds.</span></h2></div><p>Every project is its own world. Pick a direction and see where the work takes you.</p></div>
+      <ProjectExplorer />
       <a className="all-work-link" href="https://github.com/Luis-is-afk?tab=repositories" target="_blank" rel="noreferrer">MORE ON GITHUB <ArrowUpRight size={16} /></a>
     </section>
 
